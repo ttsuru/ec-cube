@@ -41,7 +41,6 @@ class ChangeController extends AbstractController
     {
         $Customer = $app->user();
         $LoginCustomer = clone $Customer;
-        $app['orm.em']->detach($LoginCustomer);
 
         $previous_password = $Customer->getPassword();
         $Customer->setPassword($app['config']['default_password']);
