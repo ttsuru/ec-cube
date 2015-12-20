@@ -50,6 +50,8 @@ class OrderService
      */
     public function getTotalQuantity(Order $Order)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $Order->calculateTotalQuantity();
     }
 
@@ -62,6 +64,8 @@ class OrderService
      */
     public function getSubTotal(Order $Order)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $Order->calculateSubTotal();
     }
 
@@ -74,6 +78,8 @@ class OrderService
      */
     public function getTotalTax(Order $Order)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $Order->calculateTotalTax();
     }
 
@@ -86,6 +92,8 @@ class OrderService
      */
     public function getProductTypes(Order $Order)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $Order->getProductTypes();
     }
 
@@ -100,6 +108,8 @@ class OrderService
      */
     public function newOrder()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $this->app['eccube.service.shopping']->newOrder();
     }
 
@@ -117,6 +127,8 @@ class OrderService
      */
     public function registerPreOrderFromCartItems($cartItems, Customer $Customer = null, $preOrderId)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $this->app['eccube.service.shopping']->createOrder($Customer);
     }
 
@@ -133,6 +145,8 @@ class OrderService
      */
     public function getAmount(Order $Order, Cart $Cart)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $this->app['eccube.service.shopping']->getAmount($Order);
     }
 
@@ -149,6 +163,8 @@ class OrderService
      */
     public function isOrderProduct($em, Order $Order)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         return $this->app['eccube.service.shopping']->isOrderProduct($em, $Order);
     }
 
@@ -165,6 +181,8 @@ class OrderService
      */
     public function setOrderUpdate($em, Order $Order, $formData)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         $this->app['eccube.service.shopping']->setOrderUpdate($Order, $formData);
     }
 
@@ -180,6 +198,8 @@ class OrderService
      */
     public function setStockUpdate($em, Order $Order)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         $this->app['eccube.service.shopping']->setStockUpdate($em, $Order);
     }
 
@@ -196,6 +216,8 @@ class OrderService
      */
     public function setCustomerUpdate($em, Order $Order, Customer $user)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         $this->app['eccube.service.shopping']->setCustomerUpdate($Order, $user);
     }
 

@@ -110,6 +110,16 @@ class Delivery extends \Eccube\Entity\AbstractEntity
     }
 
     /**
+     * __toString
+     * 
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
      * Get id
      *
      * @return integer

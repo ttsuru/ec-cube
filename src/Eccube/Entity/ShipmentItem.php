@@ -34,37 +34,6 @@ class ShipmentItem extends \Eccube\Entity\AbstractEntity
     private $price_inc_tax = null;
 
     /**
-     * Set price IncTax
-     *
-     * @param  string       $price_inc_tax
-     * @return ProductClass
-     */
-    public function setPriceIncTax($price_inc_tax)
-    {
-        $this->price_inc_tax = $price_inc_tax;
-
-        return $this;
-    }
-
-    /**
-     * Get price IncTax
-     *
-     * @return string
-     */
-    public function getPriceIncTax()
-    {
-        return $this->price_inc_tax;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getTotalPrice()
-    {
-        return $this->getPriceIncTax() * $this->getQuantity();
-    }
-
-    /**
      * @var integer
      */
     private $id;
@@ -119,6 +88,73 @@ class ShipmentItem extends \Eccube\Entity\AbstractEntity
      */
     private $Shipping;
 
+    /**
+     * Set price IncTax
+     *
+     * @param  string       $price_inc_tax
+     * @return ProductClass
+     */
+    public function setPriceIncTax($price_inc_tax)
+    {
+        $this->price_inc_tax = $price_inc_tax;
+
+        return $this;
+    }
+
+    /**
+     * Get price IncTax
+     *
+     * @return string
+     */
+    public function getPriceIncTax()
+    {
+        return $this->price_inc_tax;
+    }
+
+    /**
+     * Get total price.
+     * 
+     * @return integer
+     */
+    public function getTotalPrice()
+    {
+        return $this->getPriceIncTax() * $this->getQuantity();
+    }
+
+    /**
+     * Set from ProductClass.
+     * 
+     * @param \Eccube\Entity\ProductClass $ProductClass
+     * @return \Eccube\Entity\ShipmentItem
+     */
+    public function setFromProductClass(ProductClass $ProductClass)
+    {
+        $this
+            ->setProductClass($ProductClass)
+            ->setProductCode($ProductClass->getCode())
+            ->setPrice($ProductClass->getPrice02());
+
+        $Product = $ProductClass->getProduct();
+        if ($Product) {
+            $this
+                ->setProduct($Product)
+                ->setProductName($Product->getName());
+        } 
+
+        $ClassCategory1 = $ProductClass->getClassCategory1();
+        if ($ClassCategory1) {
+            $this->setClasscategoryName1($ClassCategory1->getName());
+            $this->setClassName1($ClassCategory1->getClassName()->getName());
+        }
+
+        $ClassCategory2 = $ProductClass->getClassCategory2();
+        if ($ClassCategory2) {
+            $this->setClasscategoryName2($ClassCategory2->getName());
+            $this->setClassName2($ClassCategory2->getClassName()->getName());
+        }
+
+        return $this;
+    }
 
     /**
      * Get id

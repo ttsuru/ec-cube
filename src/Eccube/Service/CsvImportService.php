@@ -20,13 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
-namespace Eccube\Service;
-
-use Eccube\Application;
-
-
-/**
+/*
  * Copyright (C) 2012-2014 David de Boer <david@ddeboer.nl>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -47,6 +41,10 @@ use Eccube\Application;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+
+namespace Eccube\Service;
+
 class CsvImportService implements \Iterator, \SeekableIterator, \Countable
 {
 

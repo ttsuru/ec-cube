@@ -21,33 +21,33 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-namespace Eccube\Form\Type\Front;
+
+namespace Eccube\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 
-class ShoppingShippingType extends AbstractType
+class ShippingDeliveryDateType extends AbstractType
 {
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'Eccube\Entity\CustomerAddress',
-        ));
+            ->resetViewTransformers()
+            ->addViewTransformer(new DateTimeToLocalizedStringTransformer(
+                null,
+                null,
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::NONE,
+                \IntlDateFormatter::GREGORIAN,
+                'yyyy/MM/dd'
+            ));
     }
 
     /**
@@ -55,7 +55,7 @@ class ShoppingShippingType extends AbstractType
      */
     public function getParent()
     {
-        return 'customer_address';
+        return 'choice';
     }
 
     /**
@@ -63,6 +63,7 @@ class ShoppingShippingType extends AbstractType
      */
     public function getName()
     {
-        return 'shopping_shipping';
+        return 'shipping_delivery_date';
     }
+
 }

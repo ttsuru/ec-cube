@@ -48,7 +48,6 @@ class ShippingMultipleItemType extends AbstractType
     {
         $app = $this->app;
 
-
         $builder
             ->add('quantity', 'integer', array(
                 'attr' => array(
@@ -125,10 +124,8 @@ class ShippingMultipleItemType extends AbstractType
                 }
 
                 $form['quantity']->setData($quantity);
-
             })
             ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
-
     }
 
     /**

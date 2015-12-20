@@ -33,111 +33,6 @@ use Eccube\Util\EntityUtil;
 class Order extends \Eccube\Entity\AbstractEntity
 {
     /**
-     * isMultiple
-     * 
-     * @return boolean
-     */
-    public function isMultiple()
-    {
-        return count($this->getShippings()) > 1 ? true : false;
-    }
-
-    /**
-     * isPriceChange
-     * 
-     * @return boolean
-     */
-    public function isPriceChange()
-    {
-        foreach ($this->getOrderDetails() as $OrderDetail) {
-            if ($OrderDetail->isPriceChange()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * 対象となるお届け先情報を取得
-     * 
-     * @param integer $shippingId
-     * @return \Eccube\Entity\Shipping|null
-     */
-    public function findShipping($shippingId)
-    {
-        foreach ($this->getShippings() as $Shipping) {
-            if ($Shipping->getId() == $shippingId) {
-                return $Shipping;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Calculate quantity of total.
-     *
-     * @return integer
-     */
-    public function calculateTotalQuantity()
-    {
-        $totalQuantity = 0;
-        foreach ($this->getOrderDetails() as $OrderDetail) {
-            $totalQuantity += $OrderDetail->getQuantity();
-        }
-
-        return $totalQuantity;
-    }
-
-    /**
-     * Calculate SubTotal.
-     *
-     * @return integer
-     */
-    public function calculateSubTotal()
-    {
-        $subTotal = 0;
-        foreach ($this->getOrderDetails() as $OrderDetail) {
-            $subTotal += $OrderDetail->getPriceIncTax() * $OrderDetail->getQuantity();
-        }
-
-        return $subTotal;
-    }
-
-    /**
-     * Calculate tax of total.
-     *
-     * @return integer
-     */
-    public function calculateTotalTax()
-    {
-        $tax = 0;
-        foreach ($this->getOrderDetails() as $OrderDetail) {
-            $tax += ($OrderDetail->getPriceIncTax() - $OrderDetail->getPrice()) * $OrderDetail->getQuantity();
-        }
-
-        return $tax;
-    }
-
-    /**
-     * この注文の保持する商品種別を取得します.
-     *
-     * @return \Eccube\Entity\Master\ProductType[] 一意な商品種別の配列
-     */
-    public function getProductTypes()
-    {
-        $productTypes = array();
-        foreach ($this->getOrderDetails() as $OrderDetail) {
-            /* @var $ProductClass \Eccube\Entity\ProductClass */
-            $ProductClass = $OrderDetail->getProductClass();
-            $productTypes[] = $ProductClass->getProductType();
-        }
-
-        return array_unique($productTypes);
-    }
-
-    /**
      * @var integer
      */
     private $id;
@@ -387,7 +282,8 @@ class Order extends \Eccube\Entity\AbstractEntity
      */
     public function __construct(\Eccube\Entity\Master\OrderStatus $orderStatus = null)
     {
-        $this->setDiscount(0)
+        $this
+            ->setDiscount(0)
             ->setSubtotal(0)
             ->setTotal(0)
             ->setPaymentTotal(0)
@@ -400,6 +296,149 @@ class Order extends \Eccube\Entity\AbstractEntity
         $this->OrderDetails = new \Doctrine\Common\Collections\ArrayCollection();
         $this->Shippings = new \Doctrine\Common\Collections\ArrayCollection();
         $this->MailHistories = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Customer から個人情報を設定.
+     * 
+     * @param \Eccube\Entity\Customer $Customer
+     * @return \Eccube\Entity\Order
+     */
+    public function setFromCustomer(Customer $Customer)
+    {
+        if ($Customer->getId()) {
+            $this->setCustomer($Customer);
+        }
+
+        $this
+            ->setName01($Customer->getName01())
+            ->setName02($Customer->getName02())
+            ->setKana01($Customer->getKana01())
+            ->setKana02($Customer->getKana02())
+            ->setCompanyName($Customer->getCompanyName())
+            ->setEmail($Customer->getEmail())
+            ->setTel01($Customer->getTel01())
+            ->setTel02($Customer->getTel02())
+            ->setTel03($Customer->getTel03())
+            ->setFax01($Customer->getFax01())
+            ->setFax02($Customer->getFax02())
+            ->setFax03($Customer->getFax03())
+            ->setZip01($Customer->getZip01())
+            ->setZip02($Customer->getZip02())
+            ->setZipCode($Customer->getZip01() . $Customer->getZip02())
+            ->setPref($Customer->getPref())
+            ->setAddr01($Customer->getAddr01())
+            ->setAddr02($Customer->getAddr02())
+            ->setSex($Customer->getSex())
+            ->setBirth($Customer->getBirth())
+            ->setJob($Customer->getJob());
+
+        return $this;
+    }
+
+    /**
+     * isMultiple
+     * 
+     * @return boolean
+     */
+    public function isMultiple()
+    {
+        return count($this->getShippings()) > 1 ? true : false;
+    }
+
+    /**
+     * isPriceChange
+     * 
+     * @return boolean
+     */
+    public function isPriceChange()
+    {
+        foreach ($this->getOrderDetails() as $OrderDetail) {
+            if ($OrderDetail->isPriceChange()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 対象となるお届け先情報を取得
+     * 
+     * @param integer $shippingId
+     * @return \Eccube\Entity\Shipping|null
+     */
+    public function findShipping($shippingId)
+    {
+        foreach ($this->getShippings() as $Shipping) {
+            if ($Shipping->getId() == $shippingId) {
+                return $Shipping;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculate quantity of total.
+     *
+     * @return integer
+     */
+    public function calculateTotalQuantity()
+    {
+        $totalQuantity = 0;
+        foreach ($this->getOrderDetails() as $OrderDetail) {
+            $totalQuantity += $OrderDetail->getQuantity();
+        }
+
+        return $totalQuantity;
+    }
+
+    /**
+     * Calculate SubTotal.
+     *
+     * @return integer
+     */
+    public function calculateSubTotal()
+    {
+        $subTotal = 0;
+        foreach ($this->getOrderDetails() as $OrderDetail) {
+            $subTotal += $OrderDetail->getPriceIncTax() * $OrderDetail->getQuantity();
+        }
+
+        return $subTotal;
+    }
+
+    /**
+     * Calculate tax of total.
+     *
+     * @return integer
+     */
+    public function calculateTotalTax()
+    {
+        $tax = 0;
+        foreach ($this->getOrderDetails() as $OrderDetail) {
+            $tax += ($OrderDetail->getPriceIncTax() - $OrderDetail->getPrice()) * $OrderDetail->getQuantity();
+        }
+
+        return $tax;
+    }
+
+    /**
+     * この注文の保持する商品種別を取得します.
+     *
+     * @return \Eccube\Entity\Master\ProductType[] 一意な商品種別の配列
+     */
+    public function getProductTypes()
+    {
+        $productTypes = array();
+        foreach ($this->getOrderDetails() as $OrderDetail) {
+            /* @var $ProductClass \Eccube\Entity\ProductClass */
+            $ProductClass = $OrderDetail->getProductClass();
+            $productTypes[] = $ProductClass->getProductType();
+        }
+
+        return array_unique($productTypes);
     }
 
     /**

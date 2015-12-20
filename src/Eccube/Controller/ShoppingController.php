@@ -813,6 +813,7 @@ class ShoppingController extends AbstractController
             // カートが存在しない時はエラー
             return $app->redirect($app->url('cart'));
         }
+
         $Order = $app['eccube.service.shopping']->getOrder($app['config']['order_processing']);
         if (!$Order) {
             $app->addError('front.shopping.order.error');
@@ -932,29 +933,15 @@ class ShoppingController extends AbstractController
                         $app['orm.em']->persist($Shipping);
 
                         $ProductClass = $multipleItem->getProductClass();
-                        $Product = $multipleItem->getProduct();
                         $quantity = $item['quantity']->getData();
 
                         $ShipmentItem = new ShipmentItem();
-                        $ShipmentItem->setShipping($Shipping)
+                        $ShipmentItem
+                            ->setShipping($Shipping)
                             ->setOrder($Order)
-                            ->setProductClass($ProductClass)
-                            ->setProduct($Product)
-                            ->setProductName($Product->getName())
-                            ->setProductCode($ProductClass->getCode())
-                            ->setPrice($ProductClass->getPrice02())
+                            ->setFromProductClass($ProductClass)
                             ->setQuantity($quantity);
 
-                        $ClassCategory1 = $ProductClass->getClassCategory1();
-                        if (!is_null($ClassCategory1)) {
-                            $ShipmentItem->setClasscategoryName1($ClassCategory1->getName());
-                            $ShipmentItem->setClassName1($ClassCategory1->getClassName()->getName());
-                        }
-                        $ClassCategory2 = $ProductClass->getClassCategory2();
-                        if (!is_null($ClassCategory2)) {
-                            $ShipmentItem->setClasscategoryName2($ClassCategory2->getName());
-                            $ShipmentItem->setClassName2($ClassCategory2->getClassName()->getName());
-                        }
                         $Shipping->addShipmentItem($ShipmentItem);
                         $app['orm.em']->persist($ShipmentItem);
 

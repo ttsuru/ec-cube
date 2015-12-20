@@ -33,6 +33,101 @@ class OrderDetail extends \Eccube\Entity\AbstractEntity
 {
     private $price_inc_tax = null;
 
+    /**
+     * @var integer
+     */
+    private $id;
+
+    /**
+     * @var string
+     */
+    private $product_name;
+
+    /**
+     * @var string
+     */
+    private $product_code;
+
+    /**
+     * @var string
+     */
+    private $class_category_name1;
+
+    /**
+     * @var string
+     */
+    private $class_category_name2;
+
+    /**
+     * @var string
+     */
+    private $price;
+
+    /**
+     * @var string
+     */
+    private $quantity;
+
+    /**
+     * @var string
+     */
+    private $tax_rate;
+
+    /**
+     * @var integer
+     */
+    private $tax_rule;
+
+    /**
+     * @var \Eccube\Entity\Order
+     */
+    private $Order;
+
+    /**
+     * @var \Eccube\Entity\Product
+     */
+    private $Product;
+
+    /**
+     * @var \Eccube\Entity\ProductClass
+     */
+    private $ProductClass;
+
+    /**
+     * ProductClass から関連情報を設定.
+     * 
+     * @param \Eccube\Entity\ProductClass $ProductClass
+     * @return \Eccube\Entity\OrderDetail
+     */
+    public function setFromProductClass(ProductClass $ProductClass)
+    {
+        $this
+            ->setProductClass($ProductClass)
+            ->setProductCode($ProductClass->getCode())
+            ->setPrice($ProductClass->getPrice02());
+
+        $Product = $ProductClass->getProduct();
+        if ($Product) {
+            $this
+                ->setProduct($Product)
+                ->setProductName($Product->getName());
+        } 
+
+        $ClassCategory1 = $ProductClass->getClassCategory1();
+        if ($ClassCategory1) {
+            $this->setClasscategoryName1($ClassCategory1->getName());
+            $this->setClassName1($ClassCategory1->getClassName()->getName());
+        }
+
+        $ClassCategory2 = $ProductClass->getClassCategory2();
+        if ($ClassCategory2) {
+            $this->setClasscategoryName2($ClassCategory2->getName());
+            $this->setClassName2($ClassCategory2->getClassName()->getName());
+        }
+
+        return $this;
+    }
+
     public function isPriceChange()
     {
         if (!$this->getProductClass()) {
@@ -120,66 +215,6 @@ class OrderDetail extends \Eccube\Entity\AbstractEntity
     {
         return $this->getPriceIncTax() * $this->getQuantity();
     }
-
-    /**
-     * @var integer
-     */
-    private $id;
-
-    /**
-     * @var string
-     */
-    private $product_name;
-
-    /**
-     * @var string
-     */
-    private $product_code;
-
-    /**
-     * @var string
-     */
-    private $class_category_name1;
-
-    /**
-     * @var string
-     */
-    private $class_category_name2;
-
-    /**
-     * @var string
-     */
-    private $price;
-
-    /**
-     * @var string
-     */
-    private $quantity;
-
-    /**
-     * @var string
-     */
-    private $tax_rate;
-
-    /**
-     * @var integer
-     */
-    private $tax_rule;
-
-    /**
-     * @var \Eccube\Entity\Order
-     */
-    private $Order;
-
-    /**
-     * @var \Eccube\Entity\Product
-     */
-    private $Product;
-
-    /**
-     * @var \Eccube\Entity\ProductClass
-     */
-    private $ProductClass;
 
     /**
      * Get id

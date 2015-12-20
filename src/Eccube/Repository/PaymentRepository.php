@@ -26,6 +26,10 @@ namespace Eccube\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
+use Eccube\Entity\Order;
+use Eccube\Entity\Payment;
+use Eccube\Entity\Delivery;
+use Eccube\Entity\Master\ProductType;
 
 /**
  * PaymentRepository
@@ -35,9 +39,14 @@ use Doctrine\ORM\Query;
  */
 class PaymentRepository extends EntityRepository
 {
-    public function findOrCreate($id)
+    /**
+     * 
+     * @param integer|null $id
+     * @return Payment
+     */
+    public function findOrCreate($id = null)
     {
-        if ($id == 0) {
+        if (!$id) {
             $Creator = $this
                 ->getEntityManager()
                 ->getRepository('\Eccube\Entity\Member')
@@ -57,10 +66,8 @@ class PaymentRepository extends EntityRepository
                 ->setFixFlg(1)
                 ->setChargeFlg(1)
                 ->setCreator($Creator);
-
         } else {
             $Payment = $this->find($id);
-
         }
 
         return $Payment;
@@ -68,7 +75,6 @@ class PaymentRepository extends EntityRepository
 
     public function findAllArray()
     {
-
         $query = $this
             ->getEntityManager()
             ->createQuery('SELECT p FROM Eccube\Entity\Payment p INDEX BY p.id');
@@ -76,73 +82,131 @@ class PaymentRepository extends EntityRepository
             ->getResult(Query::HYDRATE_ARRAY);
 
         return $result;
+    }
 
+    /**
+     * Order から適切な Payment を取得
+     * 
+     * プラグインなどでの拡張用に Order のみで Payment を取得
+     * 
+     * @param Order $Order
+     * @return Payment[]
+     */
+    public function findByOrder(Order $Order)
+    {
+//        return $this->findByDeliveriesAndSubtotal($Order->getDeliveries(), $Order->getSubtotal());
+        return $this->findByProductTypesAndSubtotal($Order->getProductTypes(), $Order->getSubtotal());
+    }
+
+    /**
+     * 配送方法と特定金額から共通で利用出来る適切な支払い方法を取得
+     * 
+     * @param Delivery[] $Deliveries
+     * @param integer $price
+     * @return Payment[]
+     */
+    public function findByDeliveriesAndSubtotal($Deliveries, $price = null, $hydrationMode = Query::HYDRATE_OBJECT)
+    {
+        if (!$Deliveries) {
+            return array();
+        }
+
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.rank', 'DESC');
+
+        foreach ($Deliveries as $i => $Delivery) {
+            $qb2 = $this->getEntityManager()
+                ->createQueryBuilder()
+                ->select('po_'.$i)
+                ->from('Eccube\Entity\PaymentOption', 'po_'.$i)
+                ->innerJoin('po_'.$i.'.Delivery', 'd_'.$i)
+                ->where('po_'.$i.'.payment_id = p.id')
+                ->andWhere('d_'.$i.'.id = :Delivery_'.$i);
+            $qb
+                ->setParameter('Delivery_'.$i, $Delivery)
+                ->andWhere('EXISTS('.$qb2->getDql().')');
+        }
+
+        if (!is_null($price)) {
+            $qb
+                ->andWhere('p.rule_min IS NULL OR p.rule_min <= :price')
+                ->andWhere('p.rule_max IS NULL OR p.rule_max >= :price')
+                ->setParameter('price', $price);
+        }
+
+        $Payments = $qb->getQuery()->getResult($hydrationMode);
+
+        return $Payments;
+    }
+
+    /**
+     * 商品種別と特定金額から共通で利用出来る適切な支払い方法を取得
+     * 
+     * @param ProductType[] $ProductTypes
+     * @param integer $price
+     * @return Payment[]
+     */
+    public function findByProductTypesAndSubtotal($ProductTypes, $price = null, $hydrationMode = Query::HYDRATE_OBJECT)
+    {
+        if (!$ProductTypes) {
+            return array();
+        }
+
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.rank', 'DESC');
+
+        foreach ($ProductTypes as $i => $ProductType) {
+            $qb2 = $this->getEntityManager()
+                ->createQueryBuilder()
+                ->select('po_'.$i)
+                ->from('Eccube\Entity\PaymentOption', 'po_'.$i)
+                ->innerJoin('po_'.$i.'.Delivery', 'd_'.$i)
+                ->where('po_'.$i.'.payment_id = p.id')
+                ->andWhere('d_'.$i.'.ProductType = :ProductType_'.$i);
+            $qb
+                ->setParameter('ProductType_'.$i, $ProductType)
+                ->andWhere('EXISTS('.$qb2->getDql().')');
+        }
+
+        if (!is_null($price)) {
+            $qb
+                ->andWhere('p.rule_min IS NULL OR p.rule_min <= :price')
+                ->andWhere('p.rule_max IS NULL OR p.rule_max >= :price')
+                ->setParameter('price', $price);
+        }
+
+        $Payments = $qb->getQuery()->getResult($hydrationMode);
+
+        return $Payments;
     }
 
     /**
      * 支払方法を取得
      * 条件によってはDoctrineのキャッシュが返されるため、arrayで結果を返すパターンも用意
      *
-     * @param $delivery
-     * @param $returnType true : Object、false: arrayが戻り値
-     * @return array
+     * @deprecated since 3.0.8, to be removed in 3.1
+     * @param Delivery $delivery
+     * @param boolean $returnType true: Object、false: arrayが戻り値
+     * @return Payment[]|array
      */
     public function findPayments($delivery, $returnType = false)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.8, to be removed in 3.1.', E_USER_DEPRECATED);
 
-        $query = $this->createQueryBuilder('p')
-            ->innerJoin('Eccube\Entity\PaymentOption', 'po', 'WITH', 'po.payment_id = p.id')
-            ->where('po.Delivery = (:delivery)')
-            ->orderBy('p.rank', 'DESC')
-            ->setParameter('delivery', $delivery)
-            ->getQuery();
-
-        $query->expireResultCache(false);
-
-        if ($returnType) {
-            $payments = $query->getResult();
-        } else {
-            $payments = $query->getArrayResult();
-        }
-
-        return $payments;
+        return $this->findByDeliveriesAndSubtotal(array($delivery), null, $returnType ? Query::HYDRATE_OBJECT : Query::HYDRATE_ARRAY);
     }
 
     /**
      * 共通の支払方法を取得
      *
-     * @param $deliveries
+     * @deprecated since 3.0.8, to be removed in 3.1
+     * @param  Delivery $deliveries
      * @return array
      */
     public function findAllowedPayments($deliveries)
     {
-        $payments = array();
-        $i = 0;
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.8, to be removed in 3.1.', E_USER_DEPRECATED);
 
-        foreach ($deliveries as $Delivery) {
-            $p = $this->findPayments($Delivery);
-
-            if ($i != 0) {
-
-                $arr = array();
-                foreach ($p as $payment) {
-                    foreach ($payments as $pay) {
-                        if ($payment['id'] == $pay['id']) {
-                            $arr[] = $payment;
-                            break;
-                        }
-                    }
-                }
-
-                $payments = $arr;
-
-            } else {
-                $payments = $p;
-            }
-            $i++;
-        }
-
-        return $payments;
-
+        return $this->findByDeliveriesAndSubtotal($deliveries, null, Query::HYDRATE_ARRAY);
     }
 }

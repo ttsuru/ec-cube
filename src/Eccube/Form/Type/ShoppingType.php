@@ -28,26 +28,30 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class ShoppingType extends AbstractType
 {
+
+    public $app;
+
+    public function __construct(\Eccube\Application $app)
+    {
+        $this->app = $app;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
-        $payments = $options['payments'];
-        $payment = $options['payment'];
-        $message = $options['message'];
+        $app = $this->app;
 
         $builder
             ->add('payment', 'entity', array(
                 'class' => 'Eccube\Entity\Payment',
-                'property' => 'method',
-                'choices' => $payments,
-                'data' => $payment,
+                'choices' => array(),
                 'expanded' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
@@ -55,20 +59,36 @@ class ShoppingType extends AbstractType
             ))
             ->add('message', 'textarea', array(
                 'required' => false,
-                'data' => $message,
                 'constraints' => array(
                     new Assert\Length(array('min' => 0, 'max' => 3000))),
             ))
-            ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
+            ->add('shippings', 'collection', array(
+                'type' => 'shipping_item',
+            ))
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($app) {
+                /* @var \Eccube\Entity\Order $Order */
+                $Order = $event->getData();
 
+                $form = $event->getForm();
+                $form->add('payment', 'entity', array(
+                    'class' => 'Eccube\Entity\Payment',
+                    'choices' => $app['eccube.repository.payment']->findByOrder($Order),
+                    'expanded' => true,
+                    'constraints' => array(
+                        new Assert\NotBlank(),
+                    ),
+                ));
+            })
+            ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'payments' => array(),
-            'payment' => null,
-            'message' => null,
+            'data_class' => 'Eccube\Entity\Order',
         ));
     }
 

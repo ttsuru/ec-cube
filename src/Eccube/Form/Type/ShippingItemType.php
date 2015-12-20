@@ -48,7 +48,7 @@ class ShippingItemType extends AbstractType
         $app = $this->app;
 
         $builder
-            ->addEventListener(FormEvents::PRE_SET_DATA, function ($event) use ($app) {
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($app) {
                 /** @var \Eccube\Entity\Shipping $data */
                 $data = $event->getData();
                 /** @var \Symfony\Component\Form\Form $form */
@@ -71,7 +71,7 @@ class ShippingItemType extends AbstractType
                     }
                 }
 
-                $deliveryTimes = null;
+                $deliveryTimes = array();
                 $delivery = $data->getDelivery();
                 if ($delivery) {
                     $deliveryTimes = $delivery->getDeliveryTimes();
@@ -80,55 +80,24 @@ class ShippingItemType extends AbstractType
                 $form
                     ->add('delivery', 'entity', array(
                         'class' => 'Eccube\Entity\Delivery',
-                        'property' => 'name',
                         'choices' => $deliveries,
                         'data' => $delivery,
                         'constraints' => array(
                             new Assert\NotBlank(),
                         ),
                     ))
-                    ->add('shippingDeliveryDate', 'choice', array(
+                    ->add('shippingDeliveryDate', 'shipping_delivery_date', array(
                         'choices' => $deliveryDates,
                         'required' => false,
                         'empty_value' => '指定なし',
-                        'mapped' => false,
                     ))
                     ->add('deliveryTime', 'entity', array(
                         'class' => 'Eccube\Entity\DeliveryTime',
-                        'property' => 'deliveryTime',
                         'choices' => $deliveryTimes,
                         'required' => false,
                         'empty_value' => '指定なし',
                         'empty_data' => null,
                     ));
-            })
-            ->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
-                /** @var \Eccube\Entity\Shipping $data */
-                $data = $event->getData();
-                /** @var \Symfony\Component\Form\Form $form */
-                $form = $event->getForm();
-
-                if (is_null($data)) {
-                    return;
-                }
-
-                $shippingDeliveryDate = $data->getShippingDeliveryDate();
-                if (!empty($shippingDeliveryDate)) {
-                    $form['shippingDeliveryDate']->setData($shippingDeliveryDate->format('Y/m/d'));
-                }
-
-            })
-            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-                /** @var \Eccube\Entity\Shipping $data */
-                $data = $event->getData();
-                /** @var \Symfony\Component\Form\Form $form */
-                $form = $event->getForm();
-                $shippingDeliveryDate = $form['shippingDeliveryDate']->getData();
-                if (!empty($shippingDeliveryDate)) {
-                    $data->setShippingDeliveryDate(new \DateTime($form['shippingDeliveryDate']->getData()));
-                } else {
-                    $data->setShippingDeliveryDate(null);
-                }
             })
             ->addEventSubscriber(new \Eccube\Event\FormEventSubscriber());
     }

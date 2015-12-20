@@ -229,43 +229,35 @@ class Str
     {
         $deprecated = '\Eccube\Util\Str::isBlank() の第一引数は文字型、数値を使用してください';
         // テストカバレッジを上げるために return の前で trigger_error をスローしている
+
         if (is_object($value)) {
+            @trigger_error($deprecated, E_USER_DEPRECATED);
+
             if ($value instanceof ArrayCollection) {
                 if ($value->isEmpty()) {
-                    trigger_error($deprecated, E_USER_DEPRECATED);
-
                     return true;
                 } else {
-                    trigger_error($deprecated, E_USER_DEPRECATED);
-
                     return false;
                 }
             }
-            trigger_error($deprecated, E_USER_DEPRECATED);
             return false;
         }
         if (is_array($value)) {
+            @trigger_error($deprecated, E_USER_DEPRECATED);
+
             if ($greedy) {
                 if (empty($value)) {
-                    trigger_error($deprecated, E_USER_DEPRECATED);
-
                     return true;
                 }
                 $array_result = true;
                 foreach ($value as $in) {
                     $array_result = self::isBlank($in, $greedy);
                     if (!$array_result) {
-                        trigger_error($deprecated, E_USER_DEPRECATED);
-
                         return false;
                     }
                 }
-                trigger_error($deprecated, E_USER_DEPRECATED);
-
                 return $array_result;
             } else {
-                trigger_error($deprecated, E_USER_DEPRECATED);
-
                 return empty($value);
             }
         }

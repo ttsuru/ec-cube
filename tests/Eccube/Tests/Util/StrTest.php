@@ -320,9 +320,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsBlankWithObject()
     {
         $text = new \stdClass();
@@ -331,9 +328,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsBlankWithArray()
     {
         $text = array();
@@ -342,9 +336,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsBlankWithArrayGreedy()
     {
         // $greedy = true のテスト
@@ -354,9 +345,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsBlankWithArrayGreedy2()
     {
         // $greedy = true のテスト
@@ -366,9 +354,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsBlankWithArrayGreedy3()
     {
         // $greedy = true のテスト
@@ -378,9 +363,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsNotBlankWithArray()
     {
         $text = array();
@@ -389,9 +371,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsBlankWithArrayCollectionEmpty()
     {
         $value = new ArrayCollection();
@@ -400,9 +379,6 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->actual);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Deprecated
-     */
     public function testIsBlankWithArrayCollectionNotEmpty()
     {
         $value = new ArrayCollection(array('a'));

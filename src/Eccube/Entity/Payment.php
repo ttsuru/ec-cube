@@ -30,14 +30,6 @@ namespace Eccube\Entity;
 class Payment extends \Eccube\Entity\AbstractEntity
 {
     /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getMethod();
-    }
-
-    /**
      * @var integer
      */
     private $id;
@@ -113,6 +105,14 @@ class Payment extends \Eccube\Entity\AbstractEntity
     public function __construct()
     {
         $this->PaymentOptions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getMethod();
     }
 
     /**
@@ -267,7 +267,7 @@ class Payment extends \Eccube\Entity\AbstractEntity
      * Set Creator
      *
      * @param  \Eccube\Entity\Member $Creator
-     * @return Delivery
+     * @return Payment
      */
     public function setCreator(\Eccube\Entity\Member $Creator)
     {

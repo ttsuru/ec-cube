@@ -38,11 +38,11 @@ class AbstractController
     /**
      * getBoundForm
      * 
-     * @deprecated 
+     * @deprecated since 3.0.8, to be removed in 3.1
      */
     protected function getBoundForm(Application $app, $type)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.8, to be removed in 3.1.', E_USER_DEPRECATED);
 
         $form = $app['form.factory']
             ->createBuilder($app['eccube.form.type.' . $type], $app['eccube.entity.' . $type])

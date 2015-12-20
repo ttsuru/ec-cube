@@ -45,6 +45,16 @@ class DeliveryTime extends \Eccube\Entity\AbstractEntity
     private $Delivery;
 
     /**
+     * __toString
+     * 
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getDeliveryTime();
+    }
+
+    /**
      * Get id
      *
      * @return integer

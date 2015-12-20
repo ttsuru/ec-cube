@@ -40,7 +40,6 @@ class MailService
         $this->BaseInfo = $app['eccube.repository.base_info']->get();
     }
 
-
     /**
      * Send customer confirm mail.
      *
@@ -49,7 +48,6 @@ class MailService
      */
     public function sendCustomerConfirmMail(\Eccube\Entity\Customer $Customer, $activateUrl)
     {
-
         $body = $this->app->renderView('Mail/entry_confirm.twig', array(
             'Customer' => $Customer,
             'BaseInfo' => $this->BaseInfo,
@@ -91,10 +89,7 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
-
-
 
     /**
      * Send withdraw mail.
@@ -104,7 +99,6 @@ class MailService
      */
     public function sendCustomerWithdrawMail(\Eccube\Entity\Customer $Customer, $email)
     {
-
         $body = $this->app->renderView('Mail/customer_withdraw_mail.twig', array(
             'Customer' => $Customer,
             'BaseInfo' => $this->BaseInfo,
@@ -120,9 +114,7 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
-
 
     /**
      * Send contact mail.
@@ -131,7 +123,6 @@ class MailService
      */
     public function sendContactMail($formData)
     {
-
         $body = $this->app->renderView('Mail/contact_mail.twig', array(
             'data' => $formData,
             'BaseInfo' => $this->BaseInfo,
@@ -148,7 +139,6 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
 
     /**
@@ -161,6 +151,8 @@ class MailService
      */
     public function sendrContactMail($formData)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since 3.0.0, to be removed in 3.1.', E_USER_DEPRECATED);
+
         $this->sendContactMail($formData);
     }
 
@@ -171,7 +163,6 @@ class MailService
      */
     public function sendOrderMail(\Eccube\Entity\Order $Order)
     {
-
         $MailTemplate = $this->app['eccube.repository.mail_template']->find(1);
 
         $body = $this->app->renderView($MailTemplate->getFileName(), array(
@@ -190,7 +181,6 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
 
 
@@ -202,7 +192,6 @@ class MailService
      */
     public function sendAdminCustomerConfirmMail(\Eccube\Entity\Customer $Customer, $activateUrl)
     {
-
         $body = $this->app->renderView('Mail/entry_confirm.twig', array(
             'Customer' => $Customer,
             'activateUrl' => $activateUrl,
@@ -218,7 +207,6 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
 
 
@@ -230,7 +218,6 @@ class MailService
      */
     public function sendAdminOrderMail(\Eccube\Entity\Order $Order, $formData)
     {
-
         $body = $this->app->renderView('Mail/order.twig', array(
             'header' => $formData['header'],
             'footer' => $formData['footer'],
@@ -247,7 +234,6 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
 
     /**
@@ -272,7 +258,6 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
 
     /**
@@ -297,7 +282,6 @@ class MailService
             ->setBody($body);
 
         $this->app->mail($message);
-
     }
 
 }
